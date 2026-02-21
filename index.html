@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UGPhone Trial</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-color: #fff;
+            --text-color: #000;
+            --loader-bg: #fff;
+            --spinner-color: #007aff;
+        }
+        
+        /* Dark mode tự động theo hệ thống */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000;
+                --text-color: #fff;
+                --loader-bg: #000;
+                --spinner-color: #0a84ff;
+            }
+        }
+        
+        html, body { 
+            width: 100%;
+            height: 100%; 
+            overflow: hidden;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+        
+        /* Loading overlay */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--loader-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
+        
+        #loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(128, 128, 128, 0.3);
+            border-top: 3px solid var(--spinner-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Chữ đang tải */
+        .loading-text {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 16px;
+            color: var(--text-color);
+            opacity: 0.8;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        
+        .container {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.6s ease-in;
+        }
+        
+        .container.show {
+            opacity: 1;
+        }
+        
+        iframe { 
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            transform: scale(min(1, calc(100vw / 1200)));
+            transform-origin: top left;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading screen -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div class="loading-text">Đang tải trang...</div>
+    </div>
+    
+    <!-- Content -->
+    <div class="container" id="content">
+        <iframe 
+            src="https://aselhiczu2n2s.ok.kimi.link/?sharetype=link"
+            allowfullscreen
+        ></iframe>
+    </div>
+    
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('content').classList.add('show');
+                
+                setTimeout(function() {
+                    document.getElementById('loader').style.display = 'none';
+                }, 800);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
