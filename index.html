@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Loading...</title>
+    <title>Chuyển hướng...</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="2;url=https://3uvad73jcivve.ok.kimi.link/?sharetype=link">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -20,34 +21,16 @@
             }
         }
         
-        html, body { 
+        body { 
             width: 100%;
-            height: 100%; 
-            overflow: hidden;
-            background: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        
-        /* LOADER */
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-color);
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease;
-        }
-        
-        #loader.hidden {
-            opacity: 0;
-            pointer-events: none;
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         .spinner {
@@ -68,58 +51,37 @@
         .loading-text {
             font-size: 18px;
             opacity: 0.8;
+            margin-bottom: 10px;
         }
         
-        /* IFRAME */
-        iframe { 
-            width: 100%;
-            height: 100%;
-            border: none;
+        .manual-link {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: var(--accent-1);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-weight: 500;
             opacity: 0;
-            transition: opacity 0.6s ease;
+            animation: fadeIn 0.5s ease 1.5s forwards;
         }
         
-        iframe.loaded {
-            opacity: 1;
+        @keyframes fadeIn {
+            to { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- LOADER -->
-    <div id="loader">
-        <div class="spinner"></div>
-        <div class="loading-text">Đang tải...</div>
-    </div>
+    <div class="spinner"></div>
+    <div class="loading-text">Đang chuyển hướng...</div>
     
-    <!-- IFRAME -->
-    <iframe id="service-frame" allowfullscreen></iframe>
+    <a href="https://3uvad73jcivve.ok.kimi.link/?sharetype=link" class="manual-link">
+        Nhấn vào đây nếu không tự chuyển
+    </a>
     
     <script>
-        const SERVICE_URL = "https://3uvad73jcivve.ok.kimi.link/?sharetype=link";
-        
-        window.onload = function() {
-            const iframe = document.getElementById('service-frame');
-            const loader = document.getElementById('loader');
-            
-            // Load iframe
-            iframe.src = SERVICE_URL;
-            
-            // Đợi load xong rồi ẩn loader
-            iframe.onload = function() {
-                setTimeout(() => {
-                    loader.classList.add('hidden');
-                    iframe.classList.add('loaded');
-                }, 500);
-            };
-            
-            // Fallback nếu load quá lâu (5 giây)
-            setTimeout(() => {
-                if (!iframe.classList.contains('loaded')) {
-                    loader.classList.add('hidden');
-                    iframe.classList.add('loaded');
-                }
-            }, 5000);
-        };
+        // Chuyển hướng ngay lập tức
+        window.location.href = "https://3uvad73jcivve.ok.kimi.link/?sharetype=link";
     </script>
 </body>
 </html>
