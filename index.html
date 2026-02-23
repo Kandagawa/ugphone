@@ -1,24 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>UGPhone Trial</title>
+    <title>Chọn Dịch Vụ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --bg-color: #fff;
-            --text-color: #000;
-            --loader-bg: #fff;
-            --spinner-color: #007aff;
+            --bg-color: #f5f5f7;
+            --text-color: #1d1d1f;
+            --card-bg: #ffffff;
+            --accent-1: #007aff;
+            --shadow: rgba(0,0,0,0.1);
         }
         
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg-color: #000;
-                --text-color: #fff;
-                --loader-bg: #000;
-                --spinner-color: #0a84ff;
+                --bg-color: #000000;
+                --text-color: #f5f5f7;
+                --card-bg: #1c1c1e;
+                --accent-1: #0a84ff;
+                --shadow: rgba(255,255,255,0.1);
             }
         }
         
@@ -28,34 +30,119 @@
             overflow: hidden;
             background: var(--bg-color);
             color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
-        #loader {
+        /* ===== MENU CHỌN DỊCH VỤ ===== */
+        #menu {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: var(--loader-bg);
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.8s ease-out;
+            padding: 20px;
+            z-index: 100;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
         
-        #loader.hidden {
+        #menu.hidden {
             opacity: 0;
             pointer-events: none;
+            transform: scale(0.95);
+        }
+        
+        .menu-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        .service-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px var(--shadow);
+        }
+        
+        .service-card.active {
+            border-color: var(--accent-1);
+        }
+        
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 15px auto;
+        }
+        
+        .service-card:nth-child(1) .service-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .service-card:nth-child(2) .service-icon {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .service-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        /* ===== LOADER ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        #loader.show {
+            display: flex;
+            opacity: 1;
         }
         
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(128, 128, 128, 0.3);
-            border-top: 3px solid var(--spinner-color);
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(128, 128, 128, 0.2);
+            border-top: 4px solid var(--accent-1);
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-bottom: 20px;
@@ -67,62 +154,192 @@
         }
         
         .loading-text {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            font-size: 16px;
-            color: var(--text-color);
+            font-size: 18px;
             opacity: 0.8;
-            animation: pulse 1.5s ease-in-out infinite;
         }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
+        .loading-service {
+            font-size: 14px;
+            opacity: 0.5;
+            margin-top: 10px;
         }
         
-        .container {
+        /* ===== CONTENT (IFRAME) ===== */
+        #content {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: auto; /* Cho phép scroll nếu cần */
             opacity: 0;
-            transition: opacity 0.6s ease-in;
+            transition: opacity 0.6s ease;
+            display: none;
         }
         
-        .container.show {
+        #content.show {
             opacity: 1;
+            display: block;
         }
         
         iframe { 
             width: 100%;
             height: 100%;
             border: none;
-            /* Không scale - giữ nguyên kích thước gốc */
         }
+        
+        /* Nút quay lại - NHỎ GỌN */
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1001;
+            background: var(--card-bg);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 10px var(--shadow);
+            color: var(--text-color);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        
+        .back-btn.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        
+        /* Animation cho menu */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .service-card {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        .service-card:nth-child(1) { animation-delay: 0.1s; }
+        .service-card:nth-child(2) { animation-delay: 0.2s; }
     </style>
 </head>
 <body>
-    <div id="loader">
-        <div class="spinner"></div>
-        <div class="loading-text">Đang tải trang...</div>
+    <!-- MENU CHỌN DỊCH VỤ -->
+    <div id="menu">
+        <h1 class="menu-title">Chọn Dịch Vụ</h1>
+        
+        <div class="services-grid">
+            <!-- Dịch vụ 1: UGPhone -->
+            <div class="service-card" onclick="selectService(0)">
+                <div class="service-icon">📱</div>
+                <div class="service-name">UGPhone Trial</div>
+            </div>
+            
+            <!-- Dịch vụ 2: Theo dõi -->
+            <div class="service-card" onclick="selectService(1)">
+                <div class="service-icon">📊</div>
+                <div class="service-name">Theo Dõi UG 16 Giờ</div>
+            </div>
+        </div>
     </div>
     
-    <div class="container" id="content">
-        <iframe 
-            src="https://aselhiczu2n2s.ok.kimi.link/?sharetype=link"
-            allowfullscreen
-        ></iframe>
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="spinner"></div>
+        <div class="loading-text">Đang tải dịch vụ...</div>
+        <div class="loading-service" id="loading-service-name"></div>
+    </div>
+    
+    <!-- NÚT QUAY LẠI -->
+    <button class="back-btn" id="backBtn" onclick="goBack()">
+        ← Quay lại
+    </button>
+    
+    <!-- CONTENT -->
+    <div id="content">
+        <iframe id="service-frame" allowfullscreen></iframe>
     </div>
     
     <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.getElementById('loader').classList.add('hidden');
-                document.getElementById('content').classList.add('show');
+        // Danh sách dịch vụ
+        const services = [
+            {
+                name: "UGPhone Trial",
+                url: "https://aselhiczu2n2s.ok.kimi.link/?sharetype=link",
+                icon: "📱"
+            },
+            {
+                name: "Theo Dõi UG 16 Giờ",
+                url: "https://3uvad73jcivve.ok.kimi.link/?sharetype=link",
+                icon: "📊"
+            }
+        ];
+        
+        let currentService = null;
+        
+        function selectService(index) {
+            currentService = index;
+            const service = services[index];
+            
+            // Ẩn menu
+            document.getElementById('menu').classList.add('hidden');
+            
+            // Hiện loader
+            const loader = document.getElementById('loader');
+            document.getElementById('loading-service-name').textContent = service.name;
+            loader.classList.add('show');
+            
+            // Load iframe
+            const iframe = document.getElementById('service-frame');
+            iframe.src = service.url;
+            
+            // Đợi iframe load xong
+            setTimeout(() => {
+                loader.classList.remove('show');
                 
-                setTimeout(function() {
-                    document.getElementById('loader').style.display = 'none';
-                }, 800);
-            }, 1500);
-        });
+                // Hiện content
+                const content = document.getElementById('content');
+                content.style.display = 'block';
+                setTimeout(() => content.classList.add('show'), 50);
+                
+                // Hiện nút quay lại
+                setTimeout(() => {
+                    document.getElementById('backBtn').classList.add('show');
+                }, 1000);
+            }, 2000);
+        }
+        
+        function goBack() {
+            // Ẩn content và nút back
+            document.getElementById('content').classList.remove('show');
+            document.getElementById('backBtn').classList.remove('show');
+            
+            setTimeout(() => {
+                document.getElementById('content').style.display = 'none';
+                document.getElementById('service-frame').src = '';
+                
+                // Hiện lại menu
+                document.getElementById('menu').classList.remove('hidden');
+            }, 600);
+        }
     </script>
 </body>
 </html>
