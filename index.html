@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>Chuyển hướng...</title>
+    <meta charset="UTF-8">
+    <title>Chuyển hướng an toàn...</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="2;url=https://3uvad73jcivve.ok.kimi.link/?sharetype=link">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -31,6 +31,7 @@
             background: var(--bg-color);
             color: var(--text-color);
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            overflow: hidden;
         }
         
         .spinner {
@@ -52,36 +53,86 @@
             font-size: 18px;
             opacity: 0.8;
             margin-bottom: 10px;
+            text-align: center;
+            padding: 0 20px;
         }
         
         .manual-link {
             margin-top: 20px;
-            padding: 12px 24px;
+            padding: 14px 30px;
             background: var(--accent-1);
             color: white;
             text-decoration: none;
-            border-radius: 20px;
-            font-weight: 500;
+            border-radius: 25px;
+            font-weight: 600;
             opacity: 0;
-            animation: fadeIn 0.5s ease 1.5s forwards;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s ease;
+            animation: fadeIn 0.5s ease 0.8s forwards; /* Hiện nút nhanh hơn tí */
+        }
+
+        .manual-link:active {
+            transform: scale(0.95);
         }
         
         @keyframes fadeIn {
             to { opacity: 1; }
         }
+
+        #copy-status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #34c759;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="spinner"></div>
-    <div class="loading-text">Đang chuyển hướng...</div>
+    <div class="loading-text" id="main-text">Đang chuẩn bị nội dung...</div>
+    <div id="copy-status">✅ Đã sao chép!</div>
     
-    <a href="https://3uvad73jcivve.ok.kimi.link/?sharetype=link" class="manual-link">
-        Nhấn vào đây nếu không tự chuyển
-    </a>
+    <button id="redirect-btn" class="manual-link">
+        NHẤN ĐỂ TIẾP TỤC
+    </button>
     
     <script>
-        // Chuyển hướng ngay lập tức
-        window.location.href = "https://3uvad73jcivve.ok.kimi.link/?sharetype=link";
+        // CẤU HÌNH TẠI ĐÂY
+        const CONFIG = {
+            targetUrl: "https://3uvad73jcivve.ok.kimi.link/?sharetype=link",
+            contentToCopy: "NỘI DUNG BẠN MUỐN COPY" // Thay bằng Alias Name hoặc ID của bạn
+        };
+
+        const btn = document.getElementById('redirect-btn');
+        const status = document.getElementById('copy-status');
+        const mainText = document.getElementById('main-text');
+
+        btn.addEventListener('click', async function() {
+            try {
+                // Bước 1: Copy vào Clipboard (Bắt buộc phải nằm trong event click)
+                await navigator.clipboard.writeText(CONFIG.contentToCopy);
+                
+                // Bước 2: Hiển thị trạng thái thành công
+                status.style.display = 'block';
+                mainText.innerText = "Đang chuyển hướng...";
+                btn.innerText = "ĐANG MỞ...";
+                btn.style.background = "#34c759";
+
+                // Bước 3: Chuyển hướng sau một khoảng trễ cực ngắn để đảm bảo copy xong
+                setTimeout(() => {
+                    window.location.href = CONFIG.targetUrl;
+                }, 500);
+
+            } catch (err) {
+                console.error('Lỗi copy:', err);
+                // Nếu lỗi copy vẫn cho chuyển hướng để không làm gián đoạn người dùng
+                window.location.href = CONFIG.targetUrl;
+            }
+        });
+
+        // Xóa bỏ cái auto-redirect cũ bằng meta refresh hoặc script tự động 
+        // để trình duyệt không chặn quyền Clipboard.
     </script>
 </body>
 </html>
