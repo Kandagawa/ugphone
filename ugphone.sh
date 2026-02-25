@@ -34,28 +34,28 @@ su -c "
 " > /dev/null 2>&1
 rm vnc.apk
 
-# 5. Khởi chạy ứng dụng
+# 5. Khởi chạy ứng dụng (App mở kệ app, Script vẫn chạy tiếp ở Termux)
 echo -e "\e[1;32m●\e[0m \e[1;37mThiết lập hoàn tất.\e[0m"
 for i in {3..1}; do echo -ne "\e[1;37m  Mở ứng dụng sau $i giây... \r"; sleep 1; done
 su -c "am force-stop $PKG_NAME > /dev/null 2>&1 && am start -n $PKG_NAME/$MAIN_ACT > /dev/null 2>&1"
 
-# --- FIX LỖI TỰ NHẢY LỆNH (THEO STYLE KANDAPRX) ---
-# 1. Xả sạch bộ đệm rác từ lệnh am start
+# --- XỬ LÝ NHẬP LIỆU CHUẨN (FIX LỖI TRÔI LỆNH) ---
+# Xả sạch bộ đệm rác để không bị tự động Enter
 sleep 1
 while read -t 0.1 -n 10000; do :; done
 
 while true; do
-    # 2. Sử dụng </dev/tty để đọc trực tiếp từ bàn phím, tránh bị trôi
+    # Đọc trực tiếp từ tty để không bị ảnh hưởng bởi log hệ thống
     echo -ne "\n    \033[1;36m❯\033[0m \033[1;37mNhập lệnh \033[1;32mopen\033[1;37m để khởi chạy Ngrok:\033[0m "
     read -r DATA </dev/tty
     
-    # 3. Làm sạch input (Xóa khoảng trắng)
+    # Làm sạch dữ liệu nhập vào
     DATA=$(echo "$DATA" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
     
     if [[ "$DATA" == "open" ]]; then 
         break 
     elif [[ -z "$DATA" ]]; then
-        continue # Nhấn Enter trống thì hiện lại dòng nhắc
+        continue # Nhấn Enter trống thì hiện lại dòng nhắc, không báo lỗi
     else
         echo -e "    \033[1;31m✘ Lệnh '$DATA' không hợp lệ! Vui lòng nhập 'open'.\033[0m"
     fi
@@ -76,12 +76,13 @@ tunnels:
   vnc_web: { proto: http, addr: 8080 }
 EOF
 
+# Chạy ngầm Ngrok
 (./ngrok start --all --config=ngrok_vnc.yml > /dev/null 2>&1 &)
 
 echo -ne "    \e[1;32m●\e[0m \e[1;37mĐang lấy link từ máy chủ...\r"
 sleep 7
 
-# Lấy Link Public
+# Lấy Link Public từ API nội bộ của Ngrok
 APP_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[] | select(.name=="vnc_app") | .public_url')
 WEB_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[] | select(.name=="vnc_web") | .public_url')
 
@@ -89,6 +90,6 @@ clear
 echo -e "\n    \033[1;38;5;141m[KẾT NỐI SẴN SÀNG]\033[0m"
 echo -e "    \033[1;32m✅ App:\033[0m \033[1;36m$APP_URL\033[0m"
 echo -e "    \033[1;32m✅ Web:\033[0m \033[1;36m$WEB_URL/vnc.html\033[0m"
-echo -e "\n    \033[1;33m⚠️ Lưu ý: Nhấn START trong App DroidVNC trước khi dùng link!\033[0m"
+echo -e "\n    \033[1;33m⚠️ Lưu ý: Hãy nhấn nút START trong App VNC rồi mới sử dụng link!\033[0m"
 
 rm ngrok_vnc.yml
