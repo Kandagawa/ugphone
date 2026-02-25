@@ -23,7 +23,7 @@ su -c "pm install -r $PWD/vnc.apk > /dev/null 2>&1 && sync"
 echo -e "\e[1;32m●\e[0m \e[1;37mĐang đồng bộ dữ liệu ứng dụng...\e[0m"
 sleep 3
 
-# 4. Ép quyền hệ thống bằng Root (Đã sửa biến $INPUT_SVC)
+# 4. Ép quyền hệ thống bằng Root
 echo -e "\e[1;32m●\e[0m \e[1;37mĐang kích hoạt quyền Trợ năng & Screen Cast...\e[0m"
 su -c "
   settings put secure accessibility_enabled 1 && \
@@ -36,11 +36,17 @@ su -c "
 # 5. Dọn dẹp
 rm vnc.apk
 
-# 6. Thông báo trạng thái cuối
-echo -e "\e[1;32m●\e[0m \e[1;37mThiết lập hoàn tất. Đang khởi chạy...\e[0m"
-echo -e "\e[1;33m- Kéo xuống dưới cùng nhấn START để bắt đầu.\e[0m"
+# 6. Thông báo và đếm ngược mở app
+echo -e "\e[1;32m●\e[0m \e[1;37mThiết lập hoàn tất.\e[0m"
+echo -e "\e[1;33m- Quay lại đây nếu đã Start xong.\e[0m"
+
+# Bộ đếm ngược 3 giây
+for i in {3..1}; do
+    echo -ne "\e[1;37m  Mở ứng dụng sau $i giây... \r"
+    sleep 1
+done
 
 # 7. Khởi chạy Activity chính xác
 su -c "am force-stop $PKG_NAME > /dev/null 2>&1 && am start -n $PKG_NAME/$MAIN_ACT > /dev/null 2>&1"
 
-echo -e "\e[1;32m[OK]\e[0m Ứng dụng đã sẵn sàng."
+echo -e "\e[1;32m[OK]\e[0m Ứng dụng đã được mở."
