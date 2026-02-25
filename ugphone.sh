@@ -23,27 +23,24 @@ su -c "pm install -r $PWD/vnc.apk > /dev/null 2>&1 && sync"
 echo -e "\e[1;32m●\e[0m \e[1;37mĐang đồng bộ dữ liệu ứng dụng...\e[0m"
 sleep 3
 
-# 4. Ép quyền hệ thống bằng Root
+# 4. Ép quyền hệ thống bằng Root (Đã sửa biến $INPUT_SVC)
 echo -e "\e[1;32m●\e[0m \e[1;37mĐang kích hoạt quyền Trợ năng & Screen Cast...\e[0m"
-su -c "settings put secure enabled_accessibility_services $PKG_NAME/$INPUT_SVC > /dev/null 2>&1 && \
-settings put secure accessibility_enabled 1 > /dev/null 2>&1 && \
-appops set $PKG_NAME PROJECT_MEDIA allow > /dev/null 2>&1 && \
-appops set $PKG_NAME SYSTEM_ALERT_WINDOW allow > /dev/null 2>&1"
+su -c "
+  settings put secure accessibility_enabled 1 && \
+  settings put secure enabled_accessibility_services $PKG_NAME/$INPUT_SVC && \
+  appops set $PKG_NAME PROJECT_MEDIA allow && \
+  appops set $PKG_NAME SYSTEM_ALERT_WINDOW allow && \
+  appops set $PKG_NAME WRITE_SETTINGS allow
+" > /dev/null 2>&1
 
 # 5. Dọn dẹp
 rm vnc.apk
 
-# 6. Lưu ý đơn giản và chờ lệnh Enter
-echo -e "\n\e[1;33m[!] HƯỚNG DẪN:\e[0m"
-echo -e "\e[1;37m- Chỉ kéo xuống dưới cùng và nhấn nút \e[1;32mSTART\e[0m\e[1;37m.\e[0m"
-echo -e "\e[1;37m- Tuyệt đối không chỉnh sửa bất cứ thứ gì khác.\e[0m"
-echo -e "\n\e[1;32m✔\e[0m \e[1;37mNhấn \e[1;32m[ENTER]\e[0m \e[1;37mđể mở ứng dụng...\e[0m"
+# 6. Thông báo trạng thái cuối
+echo -e "\e[1;32m●\e[0m \e[1;37mThiết lập hoàn tất. Đang khởi chạy...\e[0m"
+echo -e "\e[1;33m- Kéo xuống dưới cùng nhấn START để bắt đầu.\e[0m"
 
-# Fix lỗi không dừng lại: Xóa bộ đệm và chờ Enter chính xác
-stty sane
-read -r
-
-# 7. Khởi chạy Activity
+# 7. Khởi chạy Activity chính xác
 su -c "am force-stop $PKG_NAME > /dev/null 2>&1 && am start -n $PKG_NAME/$MAIN_ACT > /dev/null 2>&1"
 
-echo -e "\e[1;32m[OK]\e[0m Ứng dụng đã được mở."
+echo -e "\e[1;32m[OK]\e[0m Ứng dụng đã sẵn sàng."
