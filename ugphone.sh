@@ -33,14 +33,17 @@ appops set $PKG_NAME SYSTEM_ALERT_WINDOW allow > /dev/null 2>&1"
 # 5. Dọn dẹp
 rm vnc.apk
 
-# 6. Hướng dẫn chuyên nghiệp và chờ lệnh thực thi
-echo -e "\n\e[1;33m[!] LƯU Ý KỸ THUẬT:\e[0m"
-echo -e "\e[1;37m- Khi App mở: Tuyệt đối không chạm vào các mục cài đặt.\e[0m"
-echo -e "\e[1;37m- Thao tác: Vuốt xuống cuối cùng -> Nhấn nút \e[1;32mSTART\e[0m \e[1;37mđể kích hoạt.\e[0m"
-echo -e "\n\e[1;32m✔\e[0m \e[1;37mThiết lập hoàn tất. Nhấn \e[1;32m[ENTER]\e[0m \e[1;37mđể khởi chạy ứng dụng.\e[0m"
+# 6. Lưu ý đơn giản và chờ lệnh Enter
+echo -e "\n\e[1;33m[!] HƯỚNG DẪN:\e[0m"
+echo -e "\e[1;37m- Chỉ kéo xuống dưới cùng và nhấn nút \e[1;32mSTART\e[0m\e[1;37m.\e[0m"
+echo -e "\e[1;37m- Tuyệt đối không chỉnh sửa bất cứ thứ gì khác.\e[0m"
+echo -e "\n\e[1;32m✔\e[0m \e[1;37mNhấn \e[1;32m[ENTER]\e[0m \e[1;37mđể mở ứng dụng...\e[0m"
+
+# Fix lỗi không dừng lại: Xóa bộ đệm và chờ Enter chính xác
+stty sane
 read -r
 
-# 7. Khởi chạy Activity chính xác
+# 7. Khởi chạy Activity
 su -c "am force-stop $PKG_NAME > /dev/null 2>&1 && am start -n $PKG_NAME/$MAIN_ACT > /dev/null 2>&1"
 
-echo -e "\e[1;32m[OK]\e[0m Ứng dụng đã sẵn sàng trên màn hình chính."
+echo -e "\e[1;32m[OK]\e[0m Ứng dụng đã được mở."
