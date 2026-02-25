@@ -19,7 +19,7 @@ WEB_PROXY_URL="https://raw.githubusercontent.com/novnc/websockify/v0.10.0/websoc
 clear
 echo -e "\e[1;32m●\e[0m \e[1;37mBắt đầu cài đặt VNC Engine...\e[0m"
 
-# 3. Cài đặt App
+# 3. Tải và cài đặt
 wget -q -O vnc.apk $APK_URL
 su -c "pm install -r $PWD/vnc.apk > /dev/null 2>&1 && sync"
 sleep 2
@@ -34,30 +34,31 @@ su -c "
 " > /dev/null 2>&1
 rm vnc.apk
 
-# 5. Mở App
+# 5. Khởi chạy ứng dụng
 echo -e "\e[1;32m●\e[0m \e[1;37mThiết lập hoàn tất.\e[0m"
 for i in {3..1}; do echo -ne "\e[1;37m  Mở ứng dụng sau $i giây... \r"; sleep 1; done
 su -c "am force-stop $PKG_NAME > /dev/null 2>&1 && am start -n $PKG_NAME/$MAIN_ACT > /dev/null 2>&1"
 
-# Xóa sạch bộ đệm bàn phím để tránh lỗi tự nhận lệnh trống
+# --- FIX LỖI NHẬP LIỆU (Tham khảo từ script buy) ---
+# Xóa bộ đệm để tránh trôi lệnh sau khi am start
 stty sane
-read -t 1 -n 10000 discard 
+while [ -t 0 ] && read -t 0; do read -r; done 
 
-# 6. Vòng lặp nhập lệnh open (Yêu cầu nhập lại nếu sai)
 while true; do
-    echo -e "\n\e[1;37mNhập lệnh \e[1;32mopen\e[1;37m để khởi chạy cổng VNC & Web:\e[0m"
-    read -r user_cmd
+    echo -e "\n    \033[1;36m❯\033[0m \033[1;37mNhập lệnh \033[1;32mopen\033[1;37m để khởi chạy Ngrok:\033[0m "
+    read -r DATA
     
-    if [ "$user_cmd" == "open" ]; then
-        break
+    if [[ "$DATA" == "open" ]]; then 
+        break 
     else
-        echo -e "\e[1;31m[Lỗi]\e[0m Bạn nhập: '$user_cmd'. Vui lòng nhập đúng chữ 'open' để tiếp tục."
+        echo -e "    \033[1;31m✘ Lệnh không hợp lệ! Vui lòng nhập đúng 'open'.\033[0m"
     fi
 done
+# --------------------------------------------------
 
-# 7. Khởi chạy Ngrok & Web Bridge
-echo -e "\e[1;32m●\e[0m \e[1;37mĐang khởi tạo kết nối (5900 & 8080)...\e[0m"
+echo -e "    \e[1;32m●\e[0m \e[1;37mĐang khởi tạo kết nối (5900 & 8080)...\e[0m"
 
+# 6. Chạy Websockify & Ngrok
 if [ ! -f "websockify.py" ]; then
     wget -q -O websockify.py $WEB_PROXY_URL
 fi
@@ -78,18 +79,17 @@ EOF
 
 (./ngrok start --all --config=ngrok_vnc.yml > /dev/null 2>&1 &)
 
-echo -ne "\e[1;32m●\e[0m \e[1;37mĐang lấy link từ máy chủ...\r"
-sleep 6
+echo -ne "    \e[1;32m●\e[0m \e[1;37mĐang lấy link từ máy chủ...\r"
+sleep 7
 
+# Lấy Link Public
 APP_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[] | select(.name=="vnc_app") | .public_url')
 WEB_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[] | select(.name=="vnc_web") | .public_url')
 
 clear
-echo -e "\e[1;32m--- KẾT NỐI ĐÃ SẴN SÀNG ---\e[0m"
-echo -e "\e[1;37m1. Dùng App VNC Viewer:\e[0m"
-echo -e "   \e[1;36m$APP_URL\e[0m"
-echo -e "\e[1;37m2. Dùng Web (noVNC):\e[0m"
-echo -e "   \e[1;36m$WEB_URL/vnc.html\e[0m"
-echo -e "\n\e[1;33mChú ý: Nhấn START trong app rồi mới dùng link!\e[0m"
+echo -e "\n    \033[1;38;5;141m[KẾT NỐI SẴN SÀNG]\033[0m"
+echo -e "    \033[1;32m✅ App:\033[0m \033[1;36m$APP_URL\033[0m"
+echo -e "    \033[1;32m✅ Web:\033[0m \033[1;36m$WEB_URL/vnc.html\033[0m"
+echo -e "\n    \033[1;30m(Quay lại đây nếu đã Start xong app)\033[0m"
 
 rm ngrok_vnc.yml
