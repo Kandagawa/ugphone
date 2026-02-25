@@ -8,7 +8,7 @@ for pkg in wget jq curl python; do
     fi
 done
 
-# 2. Cấu hình định danh
+# 2. Cấu hình
 PKG_NAME="net.christianbeier.droidvnc_ng"
 MAIN_ACT="net.christianbeier.droidvnc_ng.MainActivity"
 INPUT_SVC="net.christianbeier.droidvnc_ng.InputService"
@@ -24,7 +24,7 @@ wget -q -O vnc.apk $APK_URL
 su -c "pm install -r $PWD/vnc.apk > /dev/null 2>&1 && sync"
 sleep 2
 
-# 4. Ép quyền Root (Fix lỗi Trợ năng & Screen Cast)
+# 4. Ép quyền Root
 su -c "
   settings put secure accessibility_enabled 1 && \
   settings put secure enabled_accessibility_services $PKG_NAME/$INPUT_SVC && \
@@ -35,31 +35,32 @@ su -c "
 rm vnc.apk
 
 # 5. Khởi chạy ứng dụng
-echo -e "\e[1;32m●\e[0m \e[1;37mThiết lập hệ thống hoàn tất.\e[0m"
+echo -e "\e[1;32m●\e[0m \e[1;37mThiết lập hoàn tất.\e[0m"
 for i in {3..1}; do echo -ne "\e[1;37m  Mở ứng dụng sau $i giây... \r"; sleep 1; done
 su -c "am force-stop $PKG_NAME > /dev/null 2>&1 && am start -n $PKG_NAME/$MAIN_ACT > /dev/null 2>&1"
 
-# --- FIX LỖI TỰ NHẢY LỆNH (TRIỆT ĐỂ) ---
-# Tạm dừng để xả sạch các ký tự 'rác' sinh ra khi mở app
-echo -e "    \033[1;33m⌛ Đang làm sạch bộ đệm đầu vào...\033[0m"
+# --- FIX LỖI TỰ NHẢY LỆNH (THEO STYLE KANDAPRX) ---
+# 1. Xả sạch bộ đệm rác từ lệnh am start
 sleep 1
-while read -t 0.1 -n 10000; do :; done # Vét sạch phím Enter ảo
+while read -t 0.1 -n 10000; do :; done
 
 while true; do
-    echo -ne "\n    \033[1;36m❯\033[0m \033[1;37mNhập lệnh \033[1;32mopen\033[1;37m để lấy link kết nối:\033[0m "
-    if read -r DATA; then
-        DATA=$(echo "$DATA" | tr -d '\r' | xargs) # Xóa ký tự lạ và khoảng trắng
-        
-        if [[ "$DATA" == "open" ]]; then 
-            break 
-        elif [[ -z "$DATA" ]]; then
-            continue # Nếu Enter trống thì hiện lại dòng nhắc, không báo lỗi
-        else
-            echo -e "    \033[1;31m✘ Lệnh không hợp lệ! Vui lòng nhập đúng 'open'.\033[0m"
-        fi
+    # 2. Sử dụng </dev/tty để đọc trực tiếp từ bàn phím, tránh bị trôi
+    echo -ne "\n    \033[1;36m❯\033[0m \033[1;37mNhập lệnh \033[1;32mopen\033[1;37m để khởi chạy Ngrok:\033[0m "
+    read -r DATA </dev/tty
+    
+    # 3. Làm sạch input (Xóa khoảng trắng)
+    DATA=$(echo "$DATA" | tr -d '[:space:]' | tr '[:upper:]' '[:lower:]')
+    
+    if [[ "$DATA" == "open" ]]; then 
+        break 
+    elif [[ -z "$DATA" ]]; then
+        continue # Nhấn Enter trống thì hiện lại dòng nhắc
+    else
+        echo -e "    \033[1;31m✘ Lệnh '$DATA' không hợp lệ! Vui lòng nhập 'open'.\033[0m"
     fi
 done
-# ---------------------------------------
+# --------------------------------------------------
 
 echo -e "    \e[1;32m●\e[0m \e[1;37mĐang kích hoạt cổng truyền tải...\e[0m"
 
@@ -80,7 +81,7 @@ EOF
 echo -ne "    \e[1;32m●\e[0m \e[1;37mĐang lấy link từ máy chủ...\r"
 sleep 7
 
-# Lấy Link Public từ API Ngrok
+# Lấy Link Public
 APP_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[] | select(.name=="vnc_app") | .public_url')
 WEB_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[] | select(.name=="vnc_web") | .public_url')
 
