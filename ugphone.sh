@@ -11,7 +11,7 @@ done
 # 2. Cấu hình
 PKG_NAME="net.christianbeier.droidvnc_ng"
 INPUT_SVC="net.christianbeier.droidvnc_ng.InputService"
-APK_URL="https://github.com/bk138/droidVNC-NG/releases/download/v2.1.0/droidvnc-ng-2.1.0.apk"
+APK_URL="https://github.com/bk138/droidVNC-NG/releases/download/v2.18.0/droidvnc-ng-2.18.0.apk"
 NGROK_TOKEN="37sHv5ZlN6vRsRnXK8hrfMPfpIB_2DJ1JAwN3ff2QcHYYuYug"
 WEB_PROXY_URL="https://raw.githubusercontent.com/novnc/websockify/v0.10.0/websockify/websocket.py"
 
